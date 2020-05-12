@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./qrcode.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+</head>
+
+<body>
+  <div id="qrcode"></div>
+  <script>
+    var share = function (wxTitle, wxDesc, link, timelineTitle, timelineDesc) {
+      var timestamp = parseInt(new Date().getTime() / 1000);
+      var nonceStr = (timestamp + parseInt(Math.random() * 100000)).toString();
+      var href = encodeURIComponent(window.location.href.replace(/#.*/, ''));
+      $.ajax({
+        url: "https://wx.puxinwangxiao.com/api/weixin/get_sign_with_appid?appid=wx2f61f7cc592f8ff5&timestamp=" + timestamp + "&noncestr=" + nonceStr + "&url=" + href,
+        dataType: 'JSON',
+        type: "get",
+        contentType: "application/json",
+        data: {},
+        success: function (data, status) {
+          wx.config({
+            debug: true,
+            appId: 'wx2f61f7cc592f8ff5',
+            timestamp: timestamp,
+            nonceStr: nonceStr,
+            signature: data.data,
+            jsApiList: ["onMenuShareTimeline", "onMenuShareAppMessage", 'hideMenuItems',]
+          });
+          wx.error(function (res) {
+            alert('失败')
+          })
+          wx.ready(function () {
+            // wx.hideMenuItems({
+            //   menuList: ["menuItem:copyUrl","menuItem:editTag","menuItem:delete","menuItem:originPage","menuItem:readMode", "menuItem:openWithQQBrowser", "menuItem:openWithSafari","menuItem:share:email","menuItem:share:brand","menuItem:share:qq","menuItem:share:QZone"] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮
+            // });
+            //发送给好友
+            wx.onMenuShareAppMessage({
+              title: wxTitle, // 分享标题
+              desc: wxDesc, // 分享描述
+              link: link, // 分享链接
+              imgUrl: 'https://topic.puxinwangxiao.com/img/logo.png?x-oss-process=image/resize,h_120', // 分享图标
+              success: function (res) {
+                //分享成功
+                alert('分享成功')
+              },
+            });
+          });
+          //朋友圈
+          wx.onMenuShareTimeline({
+            title: timelineTitle, // 分享标题
+            desc: timelineDesc, // 分享描述
+            link: link, // 分享链接
+            imgUrl: 'https://topic.puxinwangxiao.com/img/logo.png?x-oss-process=image/resize,h_120', // 分享图标
+            success: function (res) {//分享成功
+              console.log(res)
+            },
+          });
+        },
+        error: function (err) {
+        }
+      })
+    }
+    // 微信分享
+    share(
+      //微信好友title
+      '微信好友title',
+      //微信好友desc
+      '微信好友desc',
+      //link
+      'https://liyongleihf2006.github.io/main-bg/weixin_share.html',
+      //朋友圈title
+      '朋友圈title】',
+      //朋友圈desc
+      '朋友圈desc'
+    )
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+      text: "https://liyongleihf2006.github.io/main-bg/weixin_share.html",
+      width: 128,
+      height: 128,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  </script>
+</body>
+
+</html>
